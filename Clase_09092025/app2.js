@@ -26,6 +26,7 @@ for (let fruta of frutas) {
     console.log(fruta);
 }
 
+
 /*
 //MAL
 const puerto = 3306;

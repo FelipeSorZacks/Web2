@@ -12,12 +12,14 @@ console.log(saludar());
 saludar();
 */
 
-function saludo(nombreUsuario){
-    console.log("Hola, como estas?" + nombreUsuario);
-}
 
+//dandole la entrada directamente en el codigo
+function saludo(nombreUsuario){
+    console.log("Hola, como estas? " + nombreUsuario);
+}
 saludo("felipe");
 
 
+//con entrada de usuario
 let nombreUsuario2 = prompt("Como te llamas?");
 alert("Hola, como estas? " + nombreUsuario2)

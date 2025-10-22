@@ -22,6 +22,7 @@ while (true) {
         break;
     } else {
         console.log('Opción no válida.');
+        
     }
 }
 

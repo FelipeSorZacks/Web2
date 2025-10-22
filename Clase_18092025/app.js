@@ -11,3 +11,7 @@ const minumero = function(min, max) {
 }
 
 console.log(minumero(2, 20));
+
+//Funcion flecha
+const minumero2 = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
