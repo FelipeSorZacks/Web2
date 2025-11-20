@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listado de Personas (CRUD en Línea)</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container" style="max-width: 1000px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+<h1 style="margin: 0;">Listado de Personas</h1>
+<a href="/salir" class="btn-link" style="background-color: #dc3545;">Cerrar Sesión</a> </div>
+
+<% if (mensaje && mensaje.texto) { %> <div class="flash-message <%= mensaje.tipo %>"> <%= mensaje.texto %> </div>
+<% } %>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Nombre</th>
+<th>Correo</th>
+<th>Edad</th>
+<th>Trabajo</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody>
+<% personas.forEach(p => { %> <tr data-id="<%= p.id %>" class="data-row">
+<td><%= p.id %></td>
+
+        <td data-field="nombre">
+            <span class="view-mode"><%= p.nombre %></span>
+            <input type="text" name="nombre" value="<%= p.nombre %>" class="edit-mode" style="display: none;" required form="form-actualizar-<%= p.id %>">
+        </td>
+        
+        <td data-field="correo">
+            <span class="view-mode"><%= p.correo %></span>
+            <input type="email" name="correo" value="<%= p.correo %>" class="edit-mode" style="display: none;" required form="form-actualizar-<%= p.id %>">
+        </td>
+        
+        <td data-field="edad">
+            <span class="view-mode"><%= p.edad %></span>
+            <input type="number" name="edad" value="<%= p.edad %>" class="edit-mode" style="display: none; width: 60px;" required min="1" form="form-actualizar-<%= p.id %>">
+        </td>
+        
+        <td data-field="trabajo">
+            <span class="view-mode"><%= p.trabajo %></span>
+            <input type="text" name="trabajo" value="<%= p.trabajo %>" class="edit-mode" style="display: none;" required form="form-actualizar-<%= p.id %>">
+        </td>
+
+        <td class="action-cell">
+            <div class="view-mode actions-view">
+                <button type="button" class="btn-edit">Editar</button>
+                <a href="/eliminar/<%= p.id %>" class="btn-delete" onclick="return confirm('¿Estás seguro de que quieres eliminar a <%= p.nombre %>?');">Eliminar</a>
+            </div>
+            <div class="edit-mode actions-edit" style="display: none;">
+                <button type="submit" class="btn-save" form="form-actualizar-<%= p.id %>">Guardar</button>
+                <button type="button" class="btn-cancel">Cancelar</button>
+            </div>
+        </td>
+    </tr>
+    <form id="form-actualizar-<%= p.id %>" action="/actualizar/<%= p.id %>" method="post" style="display: none;"></form>
+    <% }); %>
+</tbody>
+
+
+</table>
+
+<hr style="margin: 30px 0;">
+<h2>Agregar Persona</h2>
+<form action="/agregar" method="post">
+<label for="nombre">Nombre:</label>
+<input type="text" id="nombre" name="nombre" required>
+
+<label for="correo">Correo:</label>
+<input type="email" name="correo" id="correo" required>
+
+<label for="edad">Edad:</label>
+<input type="number" name="edad" id="edad" required min="1">
+
+<label for="trabajo">Trabajo:</label>
+<input type="text" name="trabajo" id="trabajo" required>
+
+<button type="submit">Agregar Persona</button>
+
+
+</form>
+
+</div>
+
+<script>
+// El script de JavaScript no requiere cambios, ya que se basa en clases CSS genéricas y no en IDs o nombres de variables EJS.
+document.addEventListener('DOMContentLoaded', () => {
+const tableBody = document.querySelector('tbody');
+
+tableBody.addEventListener('click', (event) => {
+    // Busca la fila más cercana (<tr>) que tenga la clase 'data-row'
+    const row = event.target.closest('tr.data-row');
+    if (!row) return;
+
+    // --- HABILITAR EDICIÓN ---
+    if (event.target.classList.contains('btn-edit')) {
+        // Recorre todos los elementos dentro de la fila.
+        // Oculta todos los elementos con la clase 'view-mode'
+        row.querySelectorAll('.view-mode').forEach(el => el.style.display = 'none');
+        // Muestra todos los elementos con la clase 'edit-mode'
+        row.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'inline-block');
+    }
+
+    // --- CANCELAR EDICIÓN ---
+    if (event.target.classList.contains('btn-cancel')) {
+        
+        // 1. Ocultar edición, mostrar vista
+        row.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
+        row.querySelectorAll('.view-mode').forEach(el => el.style.display = 'inline-block');
+
+        // 2. Restaurar valores originales del input
+        row.querySelectorAll('input.edit-mode').forEach(input => {
+            // Busca el <span> con el valor original (view-mode) en la misma celda (<td>)
+            const parentCell = input.closest('td');
+            const originalSpan = parentCell ? parentCell.querySelector('span.view-mode') : null;
+            
+            if (originalSpan) {
+                input.value = originalSpan.textContent.trim();
+            }
+        });
+    }
+});
+
+
+});
+</script>
+
+</body>
+</html>
