@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Planar 2 GDL</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #e8eef3;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #2b4257;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2b4257;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: #5a7a96;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(43, 66, 87, 0.08);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2b4257;
+            margin-bottom: 24px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: #e1e8ed;
+            margin: 28px 0;
+        }
+
+        .input-section {
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #5a7a96;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .coordinates-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #5a7a96;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1dce5;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 400;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+            background: #f8fafb;
+            color: #2b4257;
+        }
+
+        .input-field::-webkit-outer-spin-button,
+        .input-field::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-field[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #4a90e2;
+            background: white;
+        }
+
+        .unit-label {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8fa9bf;
+            font-size: 0.875rem;
+            pointer-events: none;
+            margin-top: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #2b4257;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1f3142;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #2b4257;
+            border: 1px solid #d1dce5;
+            margin-top: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafb;
+            border-color: #2b4257;
+        }
+
+        #robot-display {
+            width: 100%;
+            height: 500px;
+            background: #f8fafb;
+            border-radius: 6px;
+        }
+
+        .info-note {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #f0f5f9;
+            border-left: 3px solid #4a90e2;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #5a7a96;
+            line-height: 1.6;
+        }
+
+        .graphs-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .graph-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(43, 66, 87, 0.08);
+        }
+
+        .graph-wrapper {
+            position: relative;
+            height: 300px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .graphs-container {
+                grid-template-columns: 1fr;
+            }
+
+            .coordinates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <header>
+            <h1>Robot Planar 2 GDL</h1>
+            <p class="subtitle">L₁ = L₂ = 12 cm | Pinza: 2 cm | Trayectoria: 0-20s</p>
+        </header>
+
+        <div class="content-grid">
+            <div class="card">
+                <h2 class="card-title">Panel de Control</h2>
+                
+                <div class="input-section">
+                    <div class="section-label">Posición Deseada</div>
+                    <div class="coordinates-grid">
+                        <div class="input-wrapper">
+                            <label class="input-label" for="xd">X Deseada</label>
+                            <input type="number" id="xd" class="input-field" value="10" step="0.1" min="-26" max="26">
+                            <span class="unit-label">cm</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="input-label" for="yd">Y Deseada</label>
+                            <input type="number" id="yd" class="input-field" value="10" step="0.1" min="-26" max="26">
+                            <span class="unit-label">cm</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="trasladarInstantaneo()">Trasladar TCP</button>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="input-section">
+                    <div class="section-label">Posición Inicial</div>
+                    <div class="coordinates-grid">
+                        <div class="input-wrapper">
+                            <label class="input-label" for="xi">X Inicial</label>
+                            <input type="number" id="xi" class="input-field" value="14" step="0.1" min="-26" max="26">
+                            <span class="unit-label">cm</span>
+                        </div>
+                        <div class="input-wrapper">
+                            <label class="input-label" for="yi">Y Inicial</label>
+                            <input type="number" id="yi" class="input-field" value="14" step="0.1" min="-26" max="26">
+                            <span class="unit-label">cm</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="irAPosicionInicial()">Ir a Posición Inicial</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Espacio Cartesiano</h2>
+                <canvas id="robot-display"></canvas>
+                <div class="info-note">
+                    Círculo rojo: límite de alcance. Línea punteada azul: trayectoria deseada.
+                </div>
+            </div>
+        </div>
+
+        <div class="graphs-container">
+            <div class="graph-card">
+                <h3 class="card-title">Trayectoria q₁(t)</h3>
+                <div class="graph-wrapper">
+                    <canvas id="graph-q1d"></canvas>
+                </div>
+            </div>
+
+            <div class="graph-card">
+                <h3 class="card-title">Trayectoria q₂(t)</h3>
+                <div class="graph-wrapper">
+                    <canvas id="graph-q2d"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const L1 = 12;
+        const L2 = 12;
+        const L_TOOL = 2;
+        const L_TOTAL = L1 + L2;
+        const MAX_REACH = L_TOTAL + L_TOOL;
+        const MIN_REACH = Math.abs(L1 - L2);
+        const TI = 0;
+        const TF = 20;
+        
+        let current_q1 = Math.PI / 2;
+        let current_q2 = 0;
+        
+        const canvas = document.getElementById('robot-display');
+        const ctx = canvas.getContext('2d');
+        let chartQ1, chartQ2;
+        
+        const MAX_COORD = 28;
+        let CANVAS_SIZE, SCALE, OFFSET_X, OFFSET_Y;
+
+        function updateCanvasSize() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            CANVAS_SIZE = Math.min(canvas.width, canvas.height);
+            SCALE = CANVAS_SIZE / (2 * MAX_COORD);
+            OFFSET_X = canvas.width / 2;
+            OFFSET_Y = canvas.height / 2;
+        }
+
+        function inverseKinematics(x_d, y_d) {
+            const r_d = Math.sqrt(x_d * x_d + y_d * y_d);
+            if (r_d > MAX_REACH || r_d < L_TOOL) return null;
+            
+            const r_w = r_d - L_TOOL;
+            if (r_w > L_TOTAL || r_w < MIN_REACH) return null;
+
+            const x_w = x_d * (r_w / r_d);
+            const y_w = y_d * (r_w / r_d);
+            const r_w_sq = r_w * r_w;
+
+            const cos_q2 = (r_w_sq - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+            if (Math.abs(cos_q2) > 1) return null;
+            
+            const q2_sol = Math.acos(cos_q2);
+            const alpha = Math.atan2(y_w, x_w);
+            const beta = Math.acos((r_w_sq + L1 * L1 - L2 * L2) / (2 * r_w * L1));
+            const q1_sol = alpha - beta;
+
+            return {
+                q1_rad: q1_sol,
+                q2_rad: q2_sol,
+                q1_deg: q1_sol * (180 / Math.PI),
+                q2_deg: q2_sol * (180 / Math.PI)
+            };
+        }
+
+        function fifthOrderPoly(qi, qf, ti, tf) {
+            const T = tf - ti;
+            const T3 = T * T * T;
+            const T4 = T3 * T;
+            const T5 = T4 * T;
+            const dq = qf - qi;
+            
+            const a0 = qi;
+            const a3 = 10 * dq / T3;
+            const a4 = -15 * dq / T4;
+            const a5 = 6 * dq / T5;
+
+            return function(t) {
+                if (t <= ti) return qi;
+                if (t >= tf) return qf;
+                const tau = t - ti;
+                const tau2 = tau * tau;
+                const tau3 = tau * tau2;
+                const tau4 = tau2 * tau2;
+                const tau5 = tau * tau4;
+                
+                return a0 + a3 * tau3 + a4 * tau4 + a5 * tau5;
+            };
+        }
+
+        function drawGrid() {
+            ctx.strokeStyle = 'rgba(43, 66, 87, 0.08)';
+            ctx.lineWidth = 1;
+            const gridStep = 5;
+            
+            for (let c = -MAX_COORD; c <= MAX_COORD; c += gridStep) {
+                const p = OFFSET_X + c * SCALE;
+                const p_y = OFFSET_Y - c * SCALE;
+
+                ctx.beginPath();
+                ctx.moveTo(p, 0);
+                ctx.lineTo(p, canvas.height);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(0, p_y);
+                ctx.lineTo(canvas.width, p_y);
+                ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#5a7a96';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, OFFSET_Y);
+            ctx.lineTo(canvas.width, OFFSET_Y);
+            ctx.moveTo(OFFSET_X, 0);
+            ctx.lineTo(OFFSET_X, canvas.height);
+            ctx.stroke();
+            
+            // Números en el eje X
+            ctx.fillStyle = '#2b4257';
+            ctx.font = 'bold 12px Inter';
+            for (let c = -25; c <= 25; c += 5) {
+                if (c !== 0) {
+                    const p = OFFSET_X + c * SCALE;
+                    ctx.fillText(c, p - 8, OFFSET_Y + 20);
+                }
+            }
+            
+            // Números en el eje Y
+            for (let c = -25; c <= 25; c += 5) {
+                if (c !== 0) {
+                    const p_y = OFFSET_Y - c * SCALE;
+                    ctx.fillText(c, OFFSET_X + 10, p_y + 5);
+                }
+            }
+            
+            // Etiquetas de ejes
+            ctx.fillText('X [cm]', canvas.width - 50, OFFSET_Y - 10);
+            ctx.fillText('Y [cm]', OFFSET_X + 10, 20);
+        }
+
+        function drawWorkspaceLimit() {
+            ctx.beginPath();
+            ctx.arc(OFFSET_X, OFFSET_Y, MAX_REACH * SCALE, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 6]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawRobot(q1, q2) {
+            updateCanvasSize();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            drawWorkspaceLimit();
+            
+            const q1_rad = q1;
+            const q2_rad = q2;
+
+            const x1 = L1 * Math.cos(q1_rad);
+            const y1 = L1 * Math.sin(q1_rad);
+            const x_tcp_center = x1 + L2 * Math.cos(q1_rad + q2_rad);
+            const y_tcp_center = y1 + L2 * Math.sin(q1_rad + q2_rad);
+            const x_efector = x_tcp_center + L_TOOL * Math.cos(q1_rad + q2_rad);
+            const y_efector = y_tcp_center + L_TOOL * Math.sin(q1_rad + q2_rad);
+
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            
+            ctx.strokeStyle = '#2b4257';
+            ctx.beginPath();
+            ctx.moveTo(OFFSET_X, OFFSET_Y);
+            ctx.lineTo(OFFSET_X + x1 * SCALE, OFFSET_Y - y1 * SCALE);
+            ctx.stroke();
+            
+            ctx.strokeStyle = '#4a90e2';
+            ctx.beginPath();
+            ctx.moveTo(OFFSET_X + x1 * SCALE, OFFSET_Y - y1 * SCALE);
+            ctx.lineTo(OFFSET_X + x_tcp_center * SCALE, OFFSET_Y - y_tcp_center * SCALE);
+            ctx.stroke();
+            
+            ctx.strokeStyle = '#5a7a96';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(OFFSET_X + x_tcp_center * SCALE, OFFSET_Y - y_tcp_center * SCALE);
+            ctx.lineTo(OFFSET_X + x_efector * SCALE, OFFSET_Y - y_efector * SCALE);
+            ctx.stroke();
+
+            ctx.fillStyle = '#2b4257';
+            ctx.beginPath();
+            ctx.arc(OFFSET_X, OFFSET_Y, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(OFFSET_X + x1 * SCALE, OFFSET_Y - y1 * SCALE, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(OFFSET_X + x_tcp_center * SCALE, OFFSET_Y - y_tcp_center * SCALE, 5, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.arc(OFFSET_X + x_efector * SCALE, OFFSET_Y - y_efector * SCALE, 6, 0, 2 * Math.PI);
+            ctx.fill();
+
+            current_q1 = q1_rad;
+            current_q2 = q2_rad;
+        }
+
+        function drawPath(q1_func, q2_func, N = 100) {
+            ctx.strokeStyle = '#4a90e2';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 4]);
+            ctx.globalAlpha = 0.6;
+            
+            ctx.beginPath();
+            let first = true;
+
+            for (let i = 0; i <= N; i++) {
+                const t = TI + (TF - TI) * (i / N);
+                const q1 = q1_func(t);
+                const q2 = q2_func(t);
+
+                const x1 = L1 * Math.cos(q1);
+                const y1 = L1 * Math.sin(q1);
+                const x_tcp_center = x1 + L2 * Math.cos(q1 + q2);
+                const y_tcp_center = y1 + L2 * Math.sin(q1 + q2);
+                const x_efector = x_tcp_center + L_TOOL * Math.cos(q1 + q2);
+                const y_efector = y_tcp_center + L_TOOL * Math.sin(q1 + q2);
+
+                const px = OFFSET_X + x_efector * SCALE;
+                const py = OFFSET_Y - y_efector * SCALE;
+
+                if (first) {
+                    ctx.moveTo(px, py);
+                    first = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1.0;
+        }
+
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tiempo (s)', font: { family: 'Inter', size: 11 }, color: '#5a7a96' },
+                        grid: { color: 'rgba(43, 66, 87, 0.06)' },
+                        ticks: { color: '#8fa9bf', font: { family: 'Inter', size: 10 } }
+                    },
+                    y: {
+                        title: { display: true, text: 'Ángulo (°)', font: { family: 'Inter', size: 11 }, color: '#5a7a96' },
+                        grid: { color: 'rgba(43, 66, 87, 0.06)' },
+                        ticks: { color: '#8fa9bf', font: { family: 'Inter', size: 10 } }
+                    }
+                }
+            };
+
+            chartQ1 = new Chart(document.getElementById('graph-q1d'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'q₁(t)',
+                        data: [],
+                        borderColor: '#2b4257',
+                        backgroundColor: 'rgba(43, 66, 87, 0.08)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+
+            chartQ2 = new Chart(document.getElementById('graph-q2d'), {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'q₂(t)',
+                        data: [],
+                        borderColor: '#4a90e2',
+                        backgroundColor: 'rgba(74, 144, 226, 0.08)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+        }
+
+        function updateCharts(q1_func, q2_func, N = 100) {
+            const timeLabels = [];
+            const dataQ1 = [];
+            const dataQ2 = [];
+            
+            for (let i = 0; i <= N; i++) {
+                const t = TI + (TF - TI) * (i / N);
+                timeLabels.push(t.toFixed(1));
+                dataQ1.push((q1_func(t) * (180 / Math.PI)).toFixed(2));
+                dataQ2.push((q2_func(t) * (180 / Math.PI)).toFixed(2));
+            }
+
+            chartQ1.data.labels = timeLabels;
+            chartQ1.data.datasets[0].data = dataQ1;
+            chartQ1.update();
+
+            chartQ2.data.labels = timeLabels;
+            chartQ2.data.datasets[0].data = dataQ2;
+            chartQ2.update();
+        }
+
+        function trasladarInstantaneo() {
+            const xd = parseFloat(document.getElementById('xd').value);
+            const yd = parseFloat(document.getElementById('yd').value);
+            
+            const r_d = Math.sqrt(xd*xd + yd*yd);
+            
+            if (r_d > MAX_REACH) {
+                alert(`Punto fuera del espacio de trabajo.\nAlcance máximo: ${MAX_REACH.toFixed(1)} cm.`);
+                return;
+            }
+            
+            const targetAngles = inverseKinematics(xd, yd);
+            
+            if (!targetAngles) {
+                alert(`No se encontró solución válida para el punto (${xd.toFixed(1)}, ${yd.toFixed(1)}).`);
+                return;
+            }
+            
+            const q1_final = targetAngles.q1_rad;
+            const q2_final = targetAngles.q2_rad;
+
+            const q1_poly = fifthOrderPoly(current_q1, q1_final, TI, TF);
+            const q2_poly = fifthOrderPoly(current_q2, q2_final, TI, TF);
+
+            updateCharts(q1_poly, q2_poly);
+            drawRobot(q1_final, q2_final);
+            drawPath(q1_poly, q2_poly);
+        }
+        
+        function irAPosicionInicial() {
+            const xi = parseFloat(document.getElementById('xi').value);
+            const yi = parseFloat(document.getElementById('yi').value);
+            
+            const r_d = Math.sqrt(xi*xi + yi*yi);
+            
+            if (r_d > MAX_REACH) {
+                alert(`Punto fuera del espacio de trabajo.\nAlcance máximo: ${MAX_REACH.toFixed(1)} cm.`);
+                return;
+            }
+            
+            const targetAngles = inverseKinematics(xi, yi);
+            
+            if (!targetAngles) {
+                alert(`No se encontró solución válida para el punto (${xi.toFixed(1)}, ${yi.toFixed(1)}).`);
+                return;
+            }
+            
+            const q1_final = targetAngles.q1_rad;
+            const q2_final = targetAngles.q2_rad;
+
+            const q1_poly = fifthOrderPoly(current_q1, q1_final, TI, TF);
+            const q2_poly = fifthOrderPoly(current_q2, q2_final, TI, TF);
+
+            updateCharts(q1_poly, q2_poly);
+            drawRobot(q1_final, q2_final);
+            drawPath(q1_poly, q2_poly);
+        }
+        
+        window.onload = function() {
+            initCharts();
+            updateCanvasSize();
+            
+            // Posición inicial con q1 = 90° como especifica el examen
+            irAPosicionInicial();
+        };
+
+        window.addEventListener('resize', function() {
+            drawRobot(current_q1, current_q2);
+        });
+    </script>
+
+</body>
+</html>
